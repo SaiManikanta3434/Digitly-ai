@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client only if API key is available
+let openai: any = null;
+if (process.env.OPENAI_API_KEY) {
+  const { OpenAI } = require('openai');
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 export async function POST(request: NextRequest) {
   let query = '';
@@ -20,7 +23,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!process.env.OPENAI_API_KEY) {
+    if (!openai) {
       // Fallback to simulated response if no API key
       return NextResponse.json({
         entities: [],
